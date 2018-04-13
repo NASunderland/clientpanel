@@ -1,5 +1,5 @@
-import { Client } from './../models/Clients';
 import { Injectable } from '@angular/core';
+import { Client } from './../models/Clients';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 
@@ -49,5 +49,10 @@ export class ClientService {
   updateClient(client: Client) {
     this.clientDoc = this.afs.doc<Client>(`clients/${client.id}`);
     this.clientDoc.update(client);
+  }
+
+  deleteClient(client: Client) {
+    this.clientDoc = this.afs.doc<Client>(`clients/${client.id}`);
+    this.clientDoc.delete();
   }
 }

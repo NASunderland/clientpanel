@@ -3,6 +3,7 @@ import { ClientService } from '../../services/client.service';
 import { Client } from '../../models/Clients';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-edit-client',
@@ -19,15 +20,37 @@ export class EditClientComponent implements OnInit {
     balance: 0
   };
 
-  disableBalanceOnEdit = true;
+  disableBalanceOnEdit: boolean;
 
   constructor(
     private clientService: ClientService, 
     private router: Router, 
     private route: ActivatedRoute, 
-    private flashMessage: FlashMessagesService) { }
+    private flashMessage: FlashMessagesService,
+    private settingService: SettingsService
+  ) { }
   
   ngOnInit() {
+    this.id = this.route.snapshot.params['id'];
+
+    this.clientService.getClient(this.id).subscribe(client => { console.log(client); this.client = client; });
+
+    this.disableBalanceOnEdit = this.settingService.getSettings().disableBalanceOnEdit;
+  }
+
+  onSubmit({value, valid}: {value: Client, valid: boolean}) {
+    if (!valid) {
+      this.flashMessage.show('Please fill out the form correctly', {
+        cssClass: 'alert-danger', timeout: 4000
+      });
+    } else {
+      value.id = this.id;
+      this.clientService.updateClient(value);
+      this.flashMessage.show('Client Updated', {
+        cssClass: 'alert-success', timeout: 4000
+      });
+      this.router.navigate(['/client/' + this.id]);
+    }
   }
 
 }
